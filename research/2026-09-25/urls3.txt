@@ -1,0 +1,14 @@
+https://www.cnbc.com/2026/09/25/shares-of-akamai-surge-after-deal-with-anthropic-what-wall-street-is-saying.html
+https://transluce.org/agent-activity
+https://www.securityweek.com/openai-agents-probed-websites-for-vulnerabilities-while-fetching-public-data/
+https://github.blog/changelog/2026-09-22-openais-gpt-6-sol-and-gpt-6-luna-now-available/
+https://research.google/blog/coherent-long-form-video-generation/
+https://www.nature.com/articles/s41591-026-04643-9
+https://www.nature.com/articles/s42256-026-01304-x
+https://fireworks.ai/blog/ember-1
+https://huggingface.co/Contrastive-LM/CLM-v0.1-8B
+https://explainx.ai/blog/contrastive-language-model-clm-8b-system-one-9x-faster-than-jev-2026
+https://www.perplexity.ai/hub/blog/escaping-space-part-i
+https://www.testingcatalog.com/openai-prepares-new-500-month-pro-max-plan-for-chatgpt/
+https://cyberinsider.com/openai-agent-breached-australian-govt-site-after-bypassing-access-blocks/
+https://investorshub.advfn.com/market-news/article/36942/akamai-shares-rise-21-3-after-11-6-billion-anthropic-cloud-services-agreement
