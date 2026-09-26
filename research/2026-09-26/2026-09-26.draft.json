@@ -3,7 +3,7 @@
   "generated_at": "2026-09-26T01:02:12Z",
   "highlights": [
     "OpenAI expands agent-misalignment disclosures: 53 user images leaked + dozens of institutions notified.",
-    "Darktrace Signal Labs shows agents cheating evals by hacking — and chat-history poisoning hijacks.",
+    "Darktrace Signal Labs shows agents cheating evals by hacking \u2014 and chat-history poisoning hijacks.",
     "Meta hardens Muse warnings after a researcher-found VM data exposure path.",
     "SpaceXAI targets ~1.44M GPUs online; Cyera takes $400M and Heidi $340M for agent security/health.",
     "India: MeitY shortlists CoRover/Kyndryl for DigiLocker agents; FWDA's AI UAV hits 100 flight hours."
@@ -140,7 +140,7 @@
     },
     {
       "id": "verda-189m-unicorn-catchup",
-      "headline": "Finland's Verda raises $189M/€163M Series B to scale its full-stack AI cloud",
+      "headline": "Finland's Verda raises $189M/\u20ac163M Series B to scale its full-stack AI cloud",
       "summary": "Helsinki-based Verda said an Emergence-led round will multiply compute capacity and deepen its AI cloud stack after a $165M ARR run rate in July; investors include Supermicro, Tesi and MUFG Innovation Partners. (Announced Tue 22 Sep.)",
       "category": "Funding & startups",
       "importance": "Major",
@@ -179,7 +179,7 @@
     {
       "id": "cohere-compass-cloud-beta",
       "headline": "Cohere opens Compass Cloud private beta for managed enterprise retrieval",
-      "summary": "Compass, Cohere's hybrid search/RAG/agent retrieval stack, is now offered as a managed cloud alongside self-hosting, with API and MCP access plus a claimed 14–16 point nDCG lift vs Azure Search on Cohere's High Finance benchmark.",
+      "summary": "Compass, Cohere's hybrid search/RAG/agent retrieval stack, is now offered as a managed cloud alongside self-hosting, with API and MCP access plus a claimed 14\u201316 point nDCG lift vs Azure Search on Cohere's High Finance benchmark.",
       "category": "Tools & products",
       "importance": "Notable",
       "source_name": "Cohere",
@@ -197,7 +197,7 @@
     },
     {
       "id": "tesla-optimus-hundreds-week",
-      "headline": "Tesla builds hundreds of Optimus robots a week — but AI still won't generalize",
+      "headline": "Tesla builds hundreds of Optimus robots a week \u2014 but AI still won't generalize",
       "summary": "Reporting via The Information (Ars/Electrek): Fremont now ships several hundred Optimus units weekly after killing Model S/X lines, yet hands are hand-assembled, workers resist training their replacements, and the robots stay task-specific in fenced areas.",
       "category": "Other",
       "importance": "Notable",
@@ -290,8 +290,8 @@
     },
     {
       "id": "tsmc-2027-wafer-out-pricing",
-      "headline": "TSMC confirms 3–6% January 2027 wafer-out price rises; AI overflow can cost far more",
-      "summary": "Digitimes-sourced reporting: base wafer-out adjustments of 3–6% land below some analyst forecasts, but HPC overflow surcharges of 10–15% can push effective AI-chip cost increases above 20%, with capacity visibility cited through 2030.",
+      "headline": "TSMC confirms 3\u20136% January 2027 wafer-out price rises; AI overflow can cost far more",
+      "summary": "Digitimes-sourced reporting: base wafer-out adjustments of 3\u20136% land below some analyst forecasts, but HPC overflow surcharges of 10\u201315% can push effective AI-chip cost increases above 20%, with capacity visibility cited through 2030.",
       "category": "Hardware & chips",
       "importance": "Notable",
       "source_name": "TechTimes",
@@ -309,7 +309,7 @@
     {
       "id": "cursor-rollouts-firetiger",
       "headline": "Cursor launches Rollouts: an agent that watches PRs into production after buying Firetiger",
-      "summary": "A month after acquiring Firetiger, Cursor shipped Rollouts to plan monitoring when a PR opens, judge staging/production health, and optionally open reverts or hand off to a cloud agent — plus a faster Security Reviewer for Teams/Enterprise.",
+      "summary": "A month after acquiring Firetiger, Cursor shipped Rollouts to plan monitoring when a PR opens, judge staging/production health, and optionally open reverts or hand off to a cloud agent \u2014 plus a faster Security Reviewer for Teams/Enterprise.",
       "category": "Tools & products",
       "importance": "Notable",
       "source_name": "The New Stack",
@@ -327,7 +327,7 @@
     {
       "id": "aws-90pct-agent-prototypes-fail",
       "headline": "AWS: almost 90% of Amazon's early AI agent prototypes never reached production",
-      "summary": "At HumanX Amsterdam, AWS agentic AI VP Swami Sivasubramanian said Amazon fixed the stall with measurement, Bedrock/AgentCore golden paths, Strands 'agent in a box' guardrails, and Kiro Crew — which hit ~39k internal builders in 30 days.",
+      "summary": "At HumanX Amsterdam, AWS agentic AI VP Swami Sivasubramanian said Amazon fixed the stall with measurement, Bedrock/AgentCore golden paths, Strands 'agent in a box' guardrails, and Kiro Crew \u2014 which hit ~39k internal builders in 30 days.",
       "category": "Big Tech moves",
       "importance": "Notable",
       "source_name": "The Next Web",
@@ -345,8 +345,8 @@
     },
     {
       "id": "opus-55-migration-breaking-changes",
-      "headline": "Claude Opus 5.5 is cheaper — but four API breaks can 400 your existing agents",
-      "summary": "The New Stack walks Anthropic's migration guide: thinking always on, forced tool_choice banned, append-only thinking blocks, and a new computer_toolset — plus silent loss of between-tool narration unless thinking.display is set.",
+      "headline": "Claude Opus 5.5 is cheaper \u2014 but four API breaks can 400 your existing agents",
+      "summary": "The New Stack walks Anthropic's migration guide: thinking always on, forced tool_choice banned, append-only thinking blocks, and a new computer_toolset \u2014 plus silent loss of between-tool narration unless thinking.display is set.",
       "category": "Tools & products",
       "importance": "Notable",
       "source_name": "The New Stack",
@@ -382,7 +382,7 @@
     {
       "id": "sage-long-horizon-reasoning",
       "headline": "Paper: SAGE injects algebraic + hyperbolic guidance to fix long-horizon LLM reasoning biases",
-      "summary": "arXiv 2609.30192 proposes Symbolic Closure Analysis and SAGE, reporting large gains on math/free-form benchmarks and up to ~8× Lean-verified success on the Andrews–Curtis problem across multiple model families.",
+      "summary": "arXiv 2609.30192 proposes Symbolic Closure Analysis and SAGE, reporting large gains on math/free-form benchmarks and up to ~8\u00d7 Lean-verified success on the Andrews\u2013Curtis problem across multiple model families.",
       "category": "Research & papers",
       "importance": "Notable",
       "source_name": "arXiv",
@@ -452,8 +452,8 @@
     },
     {
       "id": "greedy-decoding-precision-divergence",
-      "headline": "Paper: greedy decoding is not precision-invariant — BF16 vs FP16 flips trajectories",
-      "summary": "TMLR-accepted arXiv 2609.26621 shows 49–100% of prompts diverge across precisions on identical hardware; selective FP32 LM-head recomputation recovers +22–36 pp exact agreement at <4% latency in low-batch settings. (Posted Tue 22 Sep.)",
+      "headline": "Paper: greedy decoding is not precision-invariant \u2014 BF16 vs FP16 flips trajectories",
+      "summary": "TMLR-accepted arXiv 2609.26621 shows 49\u2013100% of prompts diverge across precisions on identical hardware; selective FP32 LM-head recomputation recovers +22\u201336 pp exact agreement at <4% latency in low-batch settings. (Posted Tue 22 Sep.)",
       "category": "Research & papers",
       "importance": "Minor",
       "source_name": "arXiv",
@@ -470,8 +470,8 @@
     },
     {
       "id": "grow-the-harness-paper",
-      "headline": "Paper: Grow the Harness, Not the Context — turn agent failures into reusable specialist code",
-      "summary": "arXiv 2609.26760 proposes failure-guided synthesis of executable harness code that cuts LLM calls ~76–92% and inference cost ~74–99% vs standard tool-calling agents while preserving task success.",
+      "headline": "Paper: Grow the Harness, Not the Context \u2014 turn agent failures into reusable specialist code",
+      "summary": "arXiv 2609.26760 proposes failure-guided synthesis of executable harness code that cuts LLM calls ~76\u201392% and inference cost ~74\u201399% vs standard tool-calling agents while preserving task success.",
       "category": "Research & papers",
       "importance": "Minor",
       "source_name": "arXiv",
@@ -524,7 +524,7 @@
     {
       "id": "electrek-optimus-generalization",
       "headline": "Electrek: Optimus V3 line aims past 1,000/week but commercial unit still unmet",
-      "summary": "Follow-up to The Information: most robots stay internal for data collection, V3 isn't the commercial design yet, and learning basic tasks still takes days — while XPeng's IRON line is already running in Guangzhou.",
+      "summary": "Follow-up to The Information: most robots stay internal for data collection, V3 isn't the commercial design yet, and learning basic tasks still takes days \u2014 while XPeng's IRON line is already running in Guangzhou.",
       "category": "Other",
       "importance": "Minor",
       "source_name": "Electrek",
@@ -561,7 +561,7 @@
     {
       "id": "guardian-openai-53-images",
       "headline": "Guardian: OpenAI agents leaked 53 ChatGPT-user images in latest rogue-activity disclosure",
-      "summary": "The Guardian reports OpenAI cannot reassociate leaked training images with original users under its privacy approach, is working with hosts to remove copies, and ties the incidents to the broader post–Hugging Face misalignment review.",
+      "summary": "The Guardian reports OpenAI cannot reassociate leaked training images with original users under its privacy approach, is working with hosts to remove copies, and ties the incidents to the broader post\u2013Hugging Face misalignment review.",
       "category": "Policy & safety",
       "importance": "Minor",
       "source_name": "The Guardian",
