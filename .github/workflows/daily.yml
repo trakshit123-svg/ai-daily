@@ -1,0 +1,138 @@
+name: Daily edition
+
+on:
+  schedule:
+    - cron: '15 0 * * *'   # 00:15 UTC = 05:45 IST
+  workflow_dispatch:
+    inputs:
+      date:
+        description: 'Edition date YYYY-MM-DD (blank = today in IST)'
+        required: false
+        default: ''
+      start:
+        description: 'Window start, ISO UTC (blank = end - WINDOW_HOURS)'
+        required: false
+        default: ''
+      end:
+        description: 'Window end, ISO UTC (blank = now)'
+        required: false
+        default: ''
+      force:
+        description: 'Overwrite an existing edition for that date even if it looks better'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  issues: write
+  pages: write
+
+concurrency:
+  group: daily-edition
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run pipeline
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+          IN_DATE: ${{ inputs.date }}
+          IN_START: ${{ inputs.start }}
+          IN_END: ${{ inputs.end }}
+          IN_FORCE: ${{ inputs.force }}
+        run: |
+          args=()
+          [ -n "$IN_DATE" ]  && args+=(--date "$IN_DATE")
+          [ -n "$IN_START" ] && args+=(--start "$IN_START")
+          [ -n "$IN_END" ]   && args+=(--end "$IN_END")
+          [ "$IN_FORCE" = "true" ] && args+=(--force)
+          python -m pipeline.run "${args[@]}"
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add editions data
+          if git diff --cached --quiet; then
+            echo "Nothing to commit"; exit 0
+          fi
+          latest=$(python -c "import json;print(json.load(open('editions/index.json'))['latest'])")
+          git commit -m "AI Daily: edition ${latest} (automated)"
+          for i in 1 2 3; do
+            git pull --rebase --autostash origin main && git push origin HEAD:main && break
+            sleep $((i * 5))
+          done
+
+      - name: Request GitHub Pages build
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds" --silent || true
+
+      - name: Summary
+        if: always()
+        run: |
+          f=$(ls -t data/runs/*.json 2>/dev/null | head -1)
+          [ -n "$f" ] && python - "$f" >> "$GITHUB_STEP_SUMMARY" <<'PY'
+          import json, sys
+          r = json.load(open(sys.argv[1]))
+          print(f"### AI Daily {r.get('date')}")
+          print(f"- mode: **{r.get('mode')}** (models: {', '.join(r.get('models') or []) or 'none'}, Gemini calls: {r.get('gemini_calls')})")
+          print(f"- items: **{r.get('items')}**, videos: **{r.get('videos')}**, candidates: {r.get('candidates')}")
+          print(f"- sources OK: {r.get('sources_ok')}/{r.get('sources_total')}")
+          bad = [s['id'] + ': ' + (s.get('error') or '') for s in r.get('sources', []) if not s.get('ok')]
+          if bad:
+              print("- failing sources: " + "; ".join(bad))
+          PY
+          true
+
+  notify-failure:
+    needs: build
+    if: failure()
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const title = 'Daily edition pipeline failed';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = `The AI Daily pipeline failed on ${new Date().toISOString()} (run: ${runUrl}).\n\nThe site keeps serving the previous edition. Check the run logs; re-run with **Actions → Daily edition → Run workflow**.`;
+            const { data: issues } = await github.rest.issues.listForRepo({ ...context.repo, state: 'open', labels: 'pipeline-failure' });
+            if (issues.length) {
+              await github.rest.issues.createComment({ ...context.repo, issue_number: issues[0].number, body });
+            } else {
+              await github.rest.issues.create({ ...context.repo, title, body, labels: ['pipeline-failure'] });
+            }
+
+  close-resolved:
+    needs: build
+    if: success()
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: issues } = await github.rest.issues.listForRepo({ ...context.repo, state: 'open', labels: 'pipeline-failure' });
+            for (const i of issues) {
+              await github.rest.issues.createComment({ ...context.repo, issue_number: i.number, body: `Resolved by a successful run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}` });
+              await github.rest.issues.update({ ...context.repo, issue_number: i.number, state: 'closed' });
+            }

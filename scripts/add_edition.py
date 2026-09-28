@@ -40,6 +40,11 @@ def validate(ed):
     need(isinstance(ed["date"], str) and DATE_RE.match(ed["date"]), "date must be YYYY-MM-DD")
     try: parse_ts(ed["generated_at"])
     except Exception: errs.append("generated_at must be ISO-8601")
+    gen = ed.get("generator")  # optional metadata written by the automated pipeline
+    if gen is not None:
+        need(isinstance(gen, dict), "generator must be an object")
+        if isinstance(gen, dict) and gen.get("mode") not in (None, "gemini", "partial", "fallback", "manual"):
+            errs.append("generator.mode must be gemini|partial|fallback|manual")
     hl = ed["highlights"]
     need(isinstance(hl, list) and all(isinstance(h, str) and h.strip() for h in hl), "highlights must be a list of non-empty strings")
     if isinstance(hl, list) and not (3 <= len(hl) <= 5): warns.append(f"highlights should have 3-5 bullets (has {len(hl)})")

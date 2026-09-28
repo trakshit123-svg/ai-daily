@@ -31,6 +31,7 @@
     search: $('#searchInput'), major: $('#majorToggle'), video: $('#videoToggle'), reset: $('#resetBtn'),
     chips: $('#chips'), feed: $('#feed'), count: $('#resultCount'), empty: $('#empty'), emptyReset: $('#emptyReset'),
     error: $('#error'), generatedAt: $('#generatedAt'), controls: document.querySelector('.controls'),
+    updatedAt: $('#updatedAt'), stale: $('#staleBanner'),
   };
 
   const state = { dates: [], date: null, edition: null, category: null, majorOnly: false, videosOnly: false, q: '' };
@@ -73,6 +74,11 @@
     // Browsers print India time as "GMT+5:30"; show the familiar "IST" instead.
     return p.d.toLocaleString(undefined, opts).replace(/GMT\+5:30|UTC\+5:30/, 'IST');
   }
+  const STALE_HOURS = 26;
+  function fmtIST(d) {
+    return d.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true })
+      .replace(/\bam\b/i, 'AM').replace(/\bpm\b/i, 'PM') + ' IST';
+  }
   function timeAgo(s) {
     const p = parseDate(s);
     if (!p || p.dateOnly) return '';
@@ -83,7 +89,9 @@
   }
 
   async function getJSON(path) {
-    const res = await fetch(path, { cache: 'no-cache' });
+    // Cache-bust edition data so a fresh edition shows up the moment it's published (GitHub Pages caches ~10 min).
+    const url = path + (path.includes('?') ? '&' : '?') + 't=' + Date.now();
+    const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) throw new Error(res.status + ' loading ' + path);
     return res.json();
   }
@@ -164,9 +172,14 @@
     const vids = items.filter(i => i.video_url).length;
     const cats = new Set(items.map(i => i.category)).size;
     els.stats.innerHTML = `<span><b>${items.length}</b> stories</span><span><b>${major}</b> major</span><span><b>${vids}</b> with video</span><span><b>${cats}</b> categories</span>`;
-    if (ed.generated_at) {
-      const g = parseDate(ed.generated_at);
-      els.generatedAt.textContent = g ? 'Edition generated ' + g.d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : '';
+    const g = ed.generated_at ? parseDate(ed.generated_at) : null;
+    els.generatedAt.textContent = g ? 'Edition generated ' + g.d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : '';
+    if (els.updatedAt) els.updatedAt.textContent = g && !g.dateOnly ? 'Updated ' + fmtIST(g.d) : '';
+    if (els.stale) {
+      const isLatest = state.dates[0] === ed.date;
+      const ageH = g ? (Date.now() - g.d.getTime()) / 3600000 : 0;
+      els.stale.hidden = !(isLatest && ageH > STALE_HOURS);
+      if (!els.stale.hidden) els.stale.textContent = `Heads up: this edition is ${Math.floor(ageH)}h old. Today's update hasn't arrived yet; new editions normally land around 6 AM IST.`;
     }
     renderChips();
     renderFeed();
@@ -270,7 +283,7 @@
 
   // PWA service worker (only when served over http/https)
   if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
-    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(r => r.update()).catch(() => {}));
   }
 
   init();

@@ -13,6 +13,9 @@ sw.js             service worker: offline app shell, network-first for editions/
 icons/            icon.svg, icon-192.png, icon-512.png
 editions/         YYYY-MM-DD.json per day, latest.json (copy of newest), index.json (list of dates)
 scripts/          add_edition.py (validate + publish), research helpers, screenshots.py
+pipeline/         automated daily pipeline (python -m pipeline.run), see "Automated pipeline" below
+data/ai_daily.db  SQLite history (sources, articles, videos, editions, edition_items); data/runs/ = run reports
+.github/workflows/daily.yml   runs the pipeline every day at 00:15 UTC (05:45 IST) and commits the edition
 research/         per-day working files (build script, URL verification logs)
 RESEARCH_PLAYBOOK.md   how to research and publish the next edition
 ```
@@ -96,4 +99,54 @@ oEmbed on every YouTube video. See **RESEARCH_PLAYBOOK.md** for the full daily r
 ```bash
 python3 -m venv ~/pwvenv && ~/pwvenv/bin/pip install playwright && ~/pwvenv/bin/python -m playwright install chromium
 ~/pwvenv/bin/python scripts/screenshots.py http://localhost:8765/   # writes screenshots/*.png
+```
+
+## Automated pipeline (no agent needed)
+
+GitHub Actions (`.github/workflows/daily.yml`) runs `python -m pipeline.run` every day at **00:15 UTC / 05:45 IST**
+(and on demand via *Actions → Daily edition → Run workflow*). It commits `editions/` + `data/` as `github-actions[bot]`,
+which redeploys GitHub Pages; the Android WebView app picks the new edition up automatically.
+
+```
+collect   ~70 sources in parallel: lab/company RSS (OpenAI, Google/DeepMind/Research, Anthropic, Meta, Microsoft, NVIDIA,
+          Hugging Face, AWS, Apple ML), outlets (TechCrunch, The Verge, MIT TR, Ars, WIRED, Guardian, NYT, Bloomberg,
+          CNBC, The Information, Techmeme…), India (ET, Mint, Inc42, YourStory, MediaNama, The Hindu, Indian Express),
+          arXiv cs.AI/CL/LG, HF Daily Papers + trending models, Hacker News (Algolia, AI-filtered), Reddit
+          r/MachineLearning + r/LocalLLaMA, and ~19 Google News queries (incl. India). Google News links are decoded
+          to publisher URLs.
+dedupe    normalised-URL hash + fuzzy titles; drops anything already published (SQLite history + recent headlines)
+sweep     Gemini + Google Search grounding finds stories the feeds missed (only kept if the page loads and is dated in-window)
+select    Gemini (structured JSON) clusters same-event coverage and picks 25-50 stories with category + importance
+verify    every source URL is fetched: 404/410 dropped, bot-blocks (401/403/429…) keep the feed-provided link
+write     Gemini writes headline / 1-2 sentence summary / tags from the fetched page + feed text only
+videos    trusted YouTube channels (official labs, major outlets) via channel pages + YouTube search
+          (Data API if YOUTUBE_API_KEY, else keyless); Gemini matches, every video must pass youtube.com/oembed
+publish   validated with scripts/add_edition.py rules -> editions/<date>.json, latest.json, index.json, SQLite
+```
+
+Robustness: every Gemini stage has a heuristic fallback (feed titles/snippets, keyword categories), so a Gemini outage
+still yields a `fallback` edition. A worse edition never replaces a better one for the same date, fewer than
+`MIN_ITEMS` (12) stories means nothing is published and the job exits non-zero, and a failed run opens/updates a
+`pipeline-failure` issue (closed automatically by the next successful run). Each edition records how it was made in
+`generator` (`mode`: gemini | partial | fallback, model, source counts).
+
+Configuration (repo **Settings → Secrets and variables → Actions**):
+
+| name | kind | purpose |
+| --- | --- | --- |
+| `GEMINI_API_KEY` | secret | Google AI Studio key (free tier works) |
+| `YOUTUBE_API_KEY` | secret, optional | YouTube Data API v3 search instead of keyless search |
+| `GEMINI_MODEL` | variable, optional | primary model (default `gemini-3.8-flash`); `GEMINI_FALLBACK_MODELS` env lists fallbacks |
+
+A run uses about 5-6 Gemini requests (sweep, select, 2× write, finalize). Free-tier daily quotas are per model, so when
+one model is exhausted the client moves to the next in the fallback list.
+
+Local use:
+
+```bash
+pip install -r requirements.txt
+python -m pipeline.check_sources                   # which feeds work right now
+python -m pipeline.run --no-llm --dry-run --out /tmp/ed.json   # heuristic-only test, writes nothing
+GEMINI_API_KEY=... python -m pipeline.run          # full run: writes editions/ + data/
+python -m pipeline.run --date 2026-09-27 --start 2026-09-26T00:30Z --end 2026-09-27T00:15Z   # backfill a day
 ```
