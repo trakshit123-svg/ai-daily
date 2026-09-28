@@ -10,6 +10,24 @@ log = logging.getLogger("collect")
 UTC = dt.timezone.utc
 
 
+PUBLISHER_NAMES = {
+    "nytimes.com": "The New York Times", "wsj.com": "The Wall Street Journal", "bloomberg.com": "Bloomberg",
+    "reuters.com": "Reuters", "ft.com": "Financial Times", "theverge.com": "The Verge", "techcrunch.com": "TechCrunch",
+    "arstechnica.com": "Ars Technica", "wired.com": "WIRED", "theguardian.com": "The Guardian", "cnbc.com": "CNBC",
+    "washingtonpost.com": "The Washington Post", "bbc.com": "BBC", "bbc.co.uk": "BBC", "apnews.com": "AP News",
+    "axios.com": "Axios", "theinformation.com": "The Information", "technologyreview.com": "MIT Technology Review",
+    "github.com": "GitHub", "arxiv.org": "arXiv", "huggingface.co": "Hugging Face", "openai.com": "OpenAI",
+    "anthropic.com": "Anthropic", "deepmind.google": "Google DeepMind", "blog.google": "Google", "x.ai": "xAI",
+    "mistral.ai": "Mistral AI", "nature.com": "Nature", "science.org": "Science", "404media.co": "404 Media",
+    "simonwillison.net": "Simon Willison", "theregister.com": "The Register", "economist.com": "The Economist",
+    "businessinsider.com": "Business Insider", "fortune.com": "Fortune", "venturebeat.com": "VentureBeat",
+}
+
+
+def publisher_name(url):
+    return domain_lookup(url, PUBLISHER_NAMES) or domain(url)
+
+
 def _ts(entry):
     t = entry.get("published_parsed") or entry.get("updated_parsed") or entry.get("created_parsed")
     if not t:
@@ -119,10 +137,13 @@ def fetch_hn(src, since, until):
         url, title = h.get("url"), h.get("title") or ""
         if not url or not looks_ai(title):
             continue
+        yr = re.search(r"\((19|20)(\d\d)\)\s*$", title)  # "(2015)" = old content resurfacing on HN
+        if yr and int(yr.group(1) + yr.group(2)) < until.year:
+            continue
         ts = dt.datetime.fromtimestamp(h["created_at_i"], UTC)
         c = _cand(src, title, url, ts, h.get("story_text") or "", via="hn", points=h.get("points", 0),
                   hn_url=f"https://news.ycombinator.com/item?id={h['objectID']}")
-        c["source_name"] = domain(url)
+        c["source_name"] = publisher_name(url)
         pts = h.get("points", 0) or 0
         c["weight"] = domain_lookup(url, REPUTABLE_DOMAINS, 1.1) + min(1.5, math.log10(max(pts, 10)) - 1.2)
         out.append(c)

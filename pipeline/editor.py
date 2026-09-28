@@ -61,7 +61,8 @@ Return a plain bulleted list of up to {max_items} distinct stories, one line eac
             return None
         if not looks_ai(page["title"], page["description"]):
             return None
-        site = page["site_name"] or ch.get("title") or domain(url)
+        from .collect import PUBLISHER_NAMES
+        site = page["site_name"] or domain_lookup(url, PUBLISHER_NAMES) or ch.get("title") or domain(url)
         return dict(title=page["title"], url=page["final_url"] or url, source_id="gemini-search", source_name=site,
                     published_at=pub, snippet=page["description"] or page["text"][:500], primary=False,
                     weight=domain_lookup(url, REPUTABLE_DOMAINS, 1.1), page=page, via="gemini-search")
