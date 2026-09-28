@@ -25,7 +25,6 @@ on:
 permissions:
   contents: write
   issues: write
-  pages: write
 
 concurrency:
   group: daily-edition
@@ -67,6 +66,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Pushing to main triggers the GitHub Pages (legacy branch) build automatically.
           git add editions data
           if git diff --cached --quiet; then
             echo "Nothing to commit"; exit 0
@@ -77,12 +77,6 @@ jobs:
             git pull --rebase --autostash origin main && git push origin HEAD:main && break
             sleep $((i * 5))
           done
-
-      - name: Request GitHub Pages build
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh api -X POST "repos/${{ github.repository }}/pages/builds" --silent || true
 
       - name: Summary
         if: always()
